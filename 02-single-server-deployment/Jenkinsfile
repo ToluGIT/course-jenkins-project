@@ -56,7 +56,6 @@ pipeline {
                         ssh -i $MY_SSH_KEY -o StrictHostKeyChecking=no ${username}@${SERVER_IP} << EOF
                             chmod +x /home/ec2-user/script.sh
                             /home/ec2-user/script.sh
-                        EOF
                         '''
                     }
                 }
