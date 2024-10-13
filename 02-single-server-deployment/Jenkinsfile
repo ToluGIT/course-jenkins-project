@@ -6,20 +6,37 @@ pipeline {
     }
     stages {
         stage('Setup') {
-            steps {               
-                sh "pip install -r requirements.txt"
+            steps {
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                '''
             }
         }
         stage('Test') {
             steps {
-                sh "pytest"
+                sh '''
+                    . venv/bin/activate
+                    pytest
+                '''
+            }
+        }
+        stage('Test') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    pytest
+                '''
             }
         }
 
         stage('Package code') {
             steps {
-                sh "zip -r myapp.zip ./* -x '*.git*'"
-                sh "ls -lart"
+                sh '''
+                    . venv/bin/activate
+                    pip freeze
+                '''
             }
         }
 
