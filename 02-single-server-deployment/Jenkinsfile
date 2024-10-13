@@ -8,6 +8,7 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
+                    cd  02-single-server-deployment/
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install -r requirements.txt
