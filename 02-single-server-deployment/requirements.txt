@@ -30,5 +30,5 @@ rsa==4.9
 tomli==2.0.1
 tqdm==4.66.1
 typing_extensions==4.9.0
-urllib3==2.1.0
+urllib3==1.26.16
 Werkzeug==3.0.1
