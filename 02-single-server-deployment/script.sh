@@ -3,6 +3,7 @@
 # Step 1: Create the application directory if it doesn't exist
 echo "Creating the app directory..."
 mkdir -p /home/ec2-user/app
+sudo yum install pip -y
 
 # Step 2: Create flask.service on the EC2 instance
 echo "Creating the flask.service file..."
