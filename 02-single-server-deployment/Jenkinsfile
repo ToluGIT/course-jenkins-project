@@ -34,10 +34,8 @@ pipeline {
 
         stage('Package code') {
             steps {
-                sh '''
-                    . venv/bin/activate
-                    pip freeze
-                '''
+                sh "zip -r myapp.zip ./* -x '*.git*'"
+                sh "ls -lart"
             }
         }
 
