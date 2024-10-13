@@ -18,20 +18,24 @@ pipeline {
         stage('verify installation') {
                 steps {
                     sh '''
+                        cd 02-single-server-deployment/
                         pip freeze
                     '''
                 }
         }
         stage('Test') {
-            steps {
-                sh '''
-                    pytest
-                '''
-            }
+                steps {
+                    sh '''
+                        cd 02-single-server-deployment/
+                        . venv/bin/activate
+                        pytest test_app.py
+                    '''
+                }
         }
 
         stage('Package code') {
             steps {
+                sh "cd 02-single-server-deployment/"
                 sh "zip -r myapp.zip ./* -x '*.git*'"
                 sh "ls -lart"
             }
