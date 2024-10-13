@@ -36,11 +36,14 @@ unzip -o /home/ec2-user/myapp.zip -d /home/ec2-user/app/
 # Step 5: Navigate to the application directory
 cd /home/ec2-user/app
 
-# Step 6: Create a virtual environment if it doesn't exist
-if [ ! -d "venv" ]; then
-    echo "Creating virtual environment..."
-    python3 -m venv venv
+# Step 6: Ensure compatibility by recreating the virtual environment if necessary
+if [ -d "venv" ]; then
+    echo "Removing existing virtual environment to avoid compatibility issues..."
+    rm -rf venv
 fi
+
+echo "Creating a new virtual environment..."
+python3 -m venv venv
 
 # Step 7: Activate the virtual environment
 echo "Activating virtual environment..."
