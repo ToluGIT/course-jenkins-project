@@ -45,29 +45,23 @@ pipeline {
         }
 
         stage('Deploy to Prod') {
-            steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'MY_SSH_KEY', usernameVariable: 'username')]) {
-                    sh '''
-                    scp -i $MY_SSH_KEY -o StrictHostKeyChecking=no 02-single-server-deployment/myapp.zip  ${username}@${SERVER_IP}:/home/ec2-user/
-                    ssh -i $MY_SSH_KEY -o StrictHostKeyChecking=no ${username}@${SERVER_IP} << EOF
-                        unzip -o /home/ec2-user/myapp.zip -d /home/ec2-user/app/
-                        source app/venv/bin/activate
-                        cd /home/ec2-user/app/
-                        # Recreate the virtual environment to ensure compatibility
-                        rm -rf venv
-                        python3 -m venv venv
-                        source venv/bin/activate
-                        pip install -r requirements.txt
-                        # Restart the Flask service
-                        sudo systemctl restart flask.service
-EOF
-                    '''
+                steps {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'MY_SSH_KEY', usernameVariable: 'username')]) {
+                        sh '''
+                        # Copy the application zip file and the deployment script to the EC2 instance
+                        scp -i $MY_SSH_KEY -o StrictHostKeyChecking=no 02-single-server-deployment/myapp.zip  ${username}@${SERVER_IP}:/home/ec2-user/
+                        scp -i $MY_SSH_KEY -o StrictHostKeyChecking=no 02-single-server-deployment/script.sh  ${username}@${SERVER_IP}:/home/ec2-user/
+
+                        # Execute the deployment script on the EC2 instance
+                        ssh -i $MY_SSH_KEY -o StrictHostKeyChecking=no ${username}@${SERVER_IP} << EOF
+                            chmod +x /home/ec2-user/script.sh
+                            /home/ec2-user/script.sh
+            EOF
+                        '''
+                    }
                 }
-            }
+
         }
-       
-        
-       
         
     }
 }
