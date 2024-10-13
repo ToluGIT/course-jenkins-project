@@ -35,9 +35,11 @@ pipeline {
 
         stage('Package code') {
             steps {
-                sh "cd 02-single-server-deployment/"
-                sh "zip -r myapp.zip ./* -x '*.git*'"
-                sh "ls -lart"
+                sh '''
+                    cd 02-single-server-deployment/
+                    zip -r myapp.zip ./* -x '*.git*'
+                    ls -lart
+                '''
             }
         }
 
@@ -51,7 +53,7 @@ pipeline {
                         source app/venv/bin/activate
                         cd /home/ec2-user/app/
                         pip install -r requirements.txt
-                        sudo systemctl restart flaskapp.service
+                        sudo systemctl restart flask.service
 EOF
                     '''
                 }
