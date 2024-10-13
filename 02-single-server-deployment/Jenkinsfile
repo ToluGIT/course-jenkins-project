@@ -15,13 +15,13 @@ pipeline {
                 '''
             }
         }
-        stage('Test1') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    pytest
-                '''
-            }
+        stage('verify installation') {
+                steps {
+                    sh '''
+                        . venv/bin/activate
+                        pip freeze
+                    '''
+                }
         }
         stage('Test') {
             steps {
