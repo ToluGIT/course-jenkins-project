@@ -27,6 +27,7 @@ pipeline {
                 steps {
                     sh '''
                         cd 02-single-server-deployment/
+                        echo "test complete
                         . venv/bin/activate
                         pytest test_app.py
                     '''
