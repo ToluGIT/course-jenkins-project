@@ -6,28 +6,34 @@ pipeline {
 
         stage('Setup') {
             steps {
-                sh "cd 03-lambda-deployment/"
-                sh "python3 -m venv venv"
-                sh ". venv/bin/activate"
-                sh "pip3 install -r lambda-app/tests/requirements.txt"
-                echo "success-1"
+                sh ''''
+                    cd 03-lambda-deployment/
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip3 install -r lambda-app/tests/requirements.txt
+                    echo "success-1"
+                '''
             }
         }
         stage('Test') {
             steps {
-                sh "cd 03-lambda-deployment/"
-                sh "python3 -m venv venv"
-                sh ". venv/bin/activate"
-                sh "pytest"
-                echo "success-2"                
+                sh '''
+                    cd 03-lambda-deployment/
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pytest
+                    echo "success-2"        
+                '''        
             }
         }
 
         stage('Build') {
             steps {
-                sh "cd 03-lambda-deployment/"
-                sh "sam build -t lambda-app/template.yaml"
-                echo "success-3"
+                sh '''
+                    cd 03-lambda-deployment/
+                    sam build -t lambda-app/template.yaml
+                    echo "success-3"
+                '''
             }
         }
         stage('Deploy') {
@@ -38,9 +44,11 @@ pipeline {
             }
             
             steps {
-                sh "cd 03-lambda-deployment/"
-                sh "sam deploy -t lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset"
-                echo "success-4"
+                sh '''
+                    cd 03-lambda-deployment/
+                    sam deploy -t lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset
+                    echo "success-4"
+                '''
             }
         }
       
