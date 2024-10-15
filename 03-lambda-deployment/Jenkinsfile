@@ -6,12 +6,11 @@ pipeline {
 
         stage('Setup') {
             steps {
-                sh ''''
+                sh '''
                     cd 03-lambda-deployment/
                     python3 -m venv venv
                     . venv/bin/activate
                     pip3 install -r lambda-app/tests/requirements.txt
-                    echo "success-1"
                 '''
             }
         }
@@ -21,9 +20,8 @@ pipeline {
                     cd 03-lambda-deployment/
                     python3 -m venv venv
                     . venv/bin/activate
-                    pytest
-                    echo "success-2"        
-                '''        
+                    pytest   
+                '''
             }
         }
 
@@ -32,7 +30,6 @@ pipeline {
                 sh '''
                     cd 03-lambda-deployment/
                     sam build -t lambda-app/template.yaml
-                    echo "success-3"
                 '''
             }
         }
@@ -47,7 +44,7 @@ pipeline {
                 sh '''
                     cd 03-lambda-deployment/
                     sam deploy -t lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset
-                    echo "success-4"
+                    echo 'step finalized'
                 '''
             }
         }
