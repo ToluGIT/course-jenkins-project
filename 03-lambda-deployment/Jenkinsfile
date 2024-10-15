@@ -8,7 +8,7 @@ pipeline {
             steps {
                 sh "cd 03-lambda-deployment/"
                 sh "python3 -m venv venv"
-                sh ". venv/bin/active"
+                sh ". venv/bin/activate"
                 sh "pip3 install -r lambda-app/tests/requirements.txt"
                 echo "success-1"
             }
@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh "cd 03-lambda-deployment/"
                 sh "python3 -m venv venv"
-                sh ". venv/bin/active"
+                sh ". venv/bin/activate"
                 sh "pytest"
                 echo "success-2"                
             }
