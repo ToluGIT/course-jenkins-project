@@ -6,19 +6,21 @@ pipeline {
 
         stage('Setup') {
             steps {
-                sh "pip3 install -r lambda-app/tests/requirements.txt"
+                sh "pip3 install -r 03-lambda-deployment/lambda-app/tests/requirements.txt"
+                echo "success-1"
             }
         }
         stage('Test') {
             steps {
                 sh "pytest"
+                echo "success-2"                
             }
         }
 
         stage('Build') {
             steps {
-                sh "sam build -t lambda-app/template.yaml"
-
+                sh "sam build -t 03-lambda-deployment/lambda-app/template.yaml"
+                echo "success-3"
             }
         }
         stage('Deploy') {
@@ -29,8 +31,8 @@ pipeline {
             }
             
             steps {
-                sh "sam deploy -t lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset"
-
+                sh "sam deploy -t 03-lambda-deployment/lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset"
+                echo "success-4"
             }
         }
       
