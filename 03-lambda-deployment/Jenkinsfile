@@ -6,12 +6,18 @@ pipeline {
 
         stage('Setup') {
             steps {
-                sh "pip3 install -r 03-lambda-deployment/lambda-app/tests/requirements.txt"
+                sh "cd 03-lambda-deployment/"
+                sh "python3 -m venv venv"
+                sh ". venv/bin/active"
+                sh "pip3 install -r lambda-app/tests/requirements.txt"
                 echo "success-1"
             }
         }
         stage('Test') {
             steps {
+                sh "cd 03-lambda-deployment/"
+                sh "python3 -m venv venv"
+                sh ". venv/bin/active"
                 sh "pytest"
                 echo "success-2"                
             }
@@ -19,7 +25,8 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "sam build -t 03-lambda-deployment/lambda-app/template.yaml"
+                sh "cd 03-lambda-deployment/"
+                sh "sam build -t lambda-app/template.yaml"
                 echo "success-3"
             }
         }
@@ -31,7 +38,8 @@ pipeline {
             }
             
             steps {
-                sh "sam deploy -t 03-lambda-deployment/lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset"
+                sh "cd 03-lambda-deployment/"
+                sh "sam deploy -t lambda-app/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset"
                 echo "success-4"
             }
         }
