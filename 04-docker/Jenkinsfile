@@ -34,7 +34,7 @@ pipeline {
             steps {
                 // Use pytest for unit testing
 		sh 'cd 04-docker/'
-                sh 'pytest'
+                sh '04-docker/pytest'
             }
         }
 
