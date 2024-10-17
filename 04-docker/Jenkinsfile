@@ -32,6 +32,7 @@ pipeline {
         stage('Unit Testing') {
             steps {
                 // Use pytest for unit testing
+		sh 'cd 04-docker/'
                 sh 'pytest'
             }
         }
@@ -54,7 +55,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image ${IMAGE_TAG}"
-                    sh "docker build -t ${IMAGE_TAG} /root/04-docker/"
+                    sh "docker build -t ${IMAGE_TAG} 04-docker/"
                 }
             }
         }
