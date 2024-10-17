@@ -61,6 +61,14 @@ pipeline {
                 }
             }
         }
+        stage('push Docker Image') {
+            steps {
+                script {
+                    echo "pushing Docker image ${IMAGE_TAG}"
+                    sh "docker push -t ${IMAGE_TAG}"
+                }
+            }
+        }
 
         stage('Approval Required') {
             steps {
