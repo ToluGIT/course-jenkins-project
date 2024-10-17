@@ -79,7 +79,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying Docker image ${env.DOCKER_IMAGE}"
-                    sh "docker run -d -p 80:80 ${env.DOCKER_IMAGE}"
+                    sh "docker run -d ${env.DOCKER_IMAGE}"
                 }
             }
         }
