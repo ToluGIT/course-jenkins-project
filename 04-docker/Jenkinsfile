@@ -11,6 +11,7 @@ pipeline {
         stage('Prepare Workspace') {
             steps {
                 // Remove the jenkins-project directory if it exists
+		sh 'rm -rf jenkins-project'
                 sh 'rm -rf docker-test docker-test@tmp'
             }
         }
