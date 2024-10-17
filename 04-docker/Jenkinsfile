@@ -21,13 +21,21 @@ pipeline {
 
         stage('Set Up Environment') {
             steps {
-                sh 'pip install -r course-jenkins-project/04-docker/requirements.txt'
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install -r course-jenkins-project/04-docker/requirements.txt
+                '''
             }
         }
 
         stage('Unit Testing') {
             steps {
-                sh 'cd course-jenkins-project/04-docker && pytest'
+                sh '''
+                . venv/bin/activate
+                cd course-jenkins-project/04-docker
+                pytest
+                '''
             }
         }
 
