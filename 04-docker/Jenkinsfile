@@ -33,8 +33,7 @@ pipeline {
         stage('Unit Testing') {
             steps {
                 // Use pytest for unit testing
-		sh 'cd 04-docker/'
-                sh '04-docker/pytest'
+                sh 'cd 04-docker && pytest'
             }
         }
 
