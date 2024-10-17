@@ -1,52 +1,81 @@
+
 pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'sanjeevkt720/jenkins-flask-app'
-        IMAGE_TAG = "${IMAGE_NAME}:${env.GIT_COMMIT}"
-        
+        IMAGE_NAME = 'toluid/tester'
+        IMAGE_TAG = "${IMAGE_NAME}:${env.BUILD_NUMBER}"
     }
 
-    
     stages {
-
-        stage('Setup') {
+        stage('Prepare Workspace') {
             steps {
-                sh "pip install -r requirements.txt"
+                // Remove the jenkins-project directory if it exists
+                sh 'rm -rf jenkins-project'
             }
         }
-        stage('Test') {
+
+        stage('Checkout Code') {
             steps {
-                sh "pytest"
+                sh 'git clone https://github.com/ToluGIT/course-jenkins-project.git'
             }
         }
 
-        stage('Login to docker hub') {
+        stage('Set Up Environment') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                sh 'echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin'}
-                echo 'Login successfully'
+                // Install libraries and packages required for build and tests
+                sh 'pip install -r 04-docker/requirements.txt'
             }
         }
 
-        stage('Build Docker Image')
-        {
-            steps
-            {
-                sh 'docker build -t ${IMAGE_TAG} .'
-                echo "Docker image build successfully"
-                sh 'docker image ls'
-                
+        stage('Unit Testing') {
+            steps {
+                // Use pytest for unit testing
+                sh 'pytest'
             }
         }
 
-        stage('Push Docker Image')
-        {
-            steps
-            {
-                sh 'docker push ${IMAGE_TAG}'
-                echo "Docker image push successfully"
+		stage('Login to DockerHub') {
+			steps {
+				withCredentials([
+					string(credentialsId: 'dockerusr', variable: 'DOCKER_USER'),
+					string(credentialsId: 'dockerpwd', variable: 'DOCKER_PASS')
+				]) {
+					sh '''
+						docker login -u $DOCKER_USER -p $DOCKER_PASS
+					'''
+					echo 'Login successful'
+				}
+			}
+		}
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building Docker image ${IMAGE_TAG}"
+                    sh "docker build -t ${IMAGE_TAG} /root/04-docker/"
+                }
             }
-        }      
+        }
+		stage('Approval Required') {
+					steps {
+						script {
+							def userInput = input(id: 'userInput', message: 'Approve and Provide docker image', parameters: [
+								string(name: 'DOCKER_IMAGE', defaultValue: 'defaultValue', description: 'Enter the docker image')
+							])
+							env.DOCKER_IMAGE = userInput
+						}
+					}
+				}
+
+		stage('Deploy Docker Image') {
+					steps {
+						script {
+							echo "Deploying Docker image ${env.DOCKER_IMAGE}"
+							sh "docker run -d ${env.DOCKER_IMAGE}"
+						}
+					}
+				}
     }
 }
+    
