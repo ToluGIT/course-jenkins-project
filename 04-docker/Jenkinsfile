@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -10,74 +9,79 @@ pipeline {
     stages {
         stage('Prepare Workspace') {
             steps {
-                // Remove the jenkins-project directory if it exists
-		sh 'rm -rf workspace/jenkins-project'
-                sh 'rm -rf workspace/docker-test workspace/docker-test@tmp'
+                sh 'rm -rf ${WORKSPACE}/*'
             }
         }
 
         stage('Checkout Code') {
-            steps {   
-		sh 'rm -rf course-jenkins-project'
+            steps {
                 sh 'git clone https://github.com/ToluGIT/course-jenkins-project.git'
             }
         }
 
         stage('Set Up Environment') {
             steps {
-                // Install libraries and packages required for build and tests
-                sh 'pip install -r 04-docker/requirements.txt'
+                sh 'pip install -r course-jenkins-project/04-docker/requirements.txt'
             }
         }
 
         stage('Unit Testing') {
             steps {
-                // Use pytest for unit testing
-                sh 'cd 04-docker && pytest'
+                sh 'cd course-jenkins-project/04-docker && pytest'
             }
         }
 
-		stage('Login to DockerHub') {
-			steps {
-				withCredentials([
-					string(credentialsId: 'dockerusr', variable: 'DOCKER_USER'),
-					string(credentialsId: 'dockerpwd', variable: 'DOCKER_PASS')
-				]) {
-					sh '''
-						docker login -u $DOCKER_USER -p $DOCKER_PASS
-					'''
-					echo 'Login successful'
-				}
-			}
-		}
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'dockerusr', variable: 'DOCKER_USER'),
+                    string(credentialsId: 'dockerpwd', variable: 'DOCKER_PASS')
+                ]) {
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
+                    echo 'Login successful'
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
                 script {
                     echo "Building Docker image ${IMAGE_TAG}"
-                    sh "docker build -t ${IMAGE_TAG} 04-docker/"
+                    sh "docker build -t ${IMAGE_TAG} course-jenkins-project/04-docker/"
                 }
             }
         }
-		stage('Approval Required') {
-					steps {
-						script {
-							def userInput = input(id: 'userInput', message: 'Approve and Provide docker image', parameters: [
-								string(name: 'DOCKER_IMAGE', defaultValue: 'defaultValue', description: 'Enter the docker image')
-							])
-							env.DOCKER_IMAGE = userInput
-						}
-					}
-				}
 
-		stage('Deploy Docker Image') {
-					steps {
-						script {
-							echo "Deploying Docker image ${env.DOCKER_IMAGE}"
-							sh "docker run -d ${env.DOCKER_IMAGE}"
-						}
-					}
-				}
+        stage('Approval Required') {
+            steps {
+                script {
+                    def userInput = input(
+                        id: 'userInput', message: 'Approve and provide the Docker image tag', parameters: [
+                            string(name: 'DOCKER_IMAGE', description: 'Enter the Docker image tag')
+                        ]
+                    )
+                    env.DOCKER_IMAGE = "${IMAGE_NAME}:${userInput}"
+                }
+            }
+        }
+
+        stage('Deploy Docker Image') {
+            steps {
+                script {
+                    echo "Deploying Docker image ${env.DOCKER_IMAGE}"
+                    sh "docker run -d -p 80:80 ${env.DOCKER_IMAGE}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up Docker containers...'
+            sh 'docker ps -q | xargs -r docker stop'
+            sh 'docker ps -aq | xargs -r docker rm'
+        }
     }
 }
-    
